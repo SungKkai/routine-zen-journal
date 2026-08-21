@@ -253,6 +253,11 @@ export function TaskDialog({
             </Button>
           </DialogFooter>
         </form>
+        <CategoryDialog
+          open={categoryOpen}
+          onOpenChange={setCategoryOpen}
+          onCreated={(c) => setCategoryId(c.id)}
+        />
       </DialogContent>
     </Dialog>
   );
