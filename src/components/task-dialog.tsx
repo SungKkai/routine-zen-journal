@@ -31,6 +31,7 @@ import {
   type Task,
 } from "@/lib/data";
 import { useTimer } from "@/components/timer-provider";
+import { CategoryDialog } from "@/components/category-dialog";
 
 const NO_CATEGORY = "__none__";
 
@@ -58,6 +59,7 @@ export function TaskDialog({
   const [categoryId, setCategoryId] = useState<string>(NO_CATEGORY);
   const [dueDate, setDueDate] = useState("");
   const [dueTime, setDueTime] = useState("");
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -145,19 +147,36 @@ export function TaskDialog({
             </div>
             <div className="space-y-2">
               <Label>Category</Label>
-              <Select value={categoryId} onValueChange={setCategoryId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_CATEGORY}>No category</SelectItem>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select value={categoryId} onValueChange={setCategoryId}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NO_CATEGORY}>No category</SelectItem>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        <span className="flex items-center gap-2">
+                          <span
+                            className="size-2.5 rounded-full"
+                            style={{ backgroundColor: c.color ?? "#c2410c" }}
+                          />
+                          {c.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Add category"
+                  onClick={() => setCategoryOpen(true)}
+                >
+                  +
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="task-date">Due date</Label>
@@ -234,6 +253,11 @@ export function TaskDialog({
             </Button>
           </DialogFooter>
         </form>
+        <CategoryDialog
+          open={categoryOpen}
+          onOpenChange={setCategoryOpen}
+          onCreated={(c) => setCategoryId(c.id)}
+        />
       </DialogContent>
     </Dialog>
   );
