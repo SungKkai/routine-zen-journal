@@ -31,6 +31,7 @@ import {
   type Task,
 } from "@/lib/data";
 import { useTimer } from "@/components/timer-provider";
+import { CategoryDialog } from "@/components/category-dialog";
 
 const NO_CATEGORY = "__none__";
 
@@ -58,6 +59,7 @@ export function TaskDialog({
   const [categoryId, setCategoryId] = useState<string>(NO_CATEGORY);
   const [dueDate, setDueDate] = useState("");
   const [dueTime, setDueTime] = useState("");
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
