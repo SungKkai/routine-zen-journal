@@ -145,19 +145,36 @@ export function TaskDialog({
             </div>
             <div className="space-y-2">
               <Label>Category</Label>
-              <Select value={categoryId} onValueChange={setCategoryId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_CATEGORY}>No category</SelectItem>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select value={categoryId} onValueChange={setCategoryId}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="None" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NO_CATEGORY}>No category</SelectItem>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        <span className="flex items-center gap-2">
+                          <span
+                            className="size-2.5 rounded-full"
+                            style={{ backgroundColor: c.color ?? "#c2410c" }}
+                          />
+                          {c.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Add category"
+                  onClick={() => setCategoryOpen(true)}
+                >
+                  +
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="task-date">Due date</Label>

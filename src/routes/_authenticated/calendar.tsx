@@ -83,7 +83,7 @@ function CalendarPage() {
 
   function taskColor(task: Task) {
     const cat = task.category_id ? categoryById.get(task.category_id) : null;
-    return cat?.color ?? PRIORITY_COLOR[task.priority] ?? PRIORITY_COLOR.medium!;
+    return cat?.color ?? PRIORITY_COLOR[task.priority] ?? PRIORITY_COLOR["medium"]!;
   }
 
   return (
