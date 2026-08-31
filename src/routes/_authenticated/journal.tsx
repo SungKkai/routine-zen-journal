@@ -238,16 +238,7 @@ function JournalPage() {
               </p>
             )}
             {messages.map((m) => (
-              <div
-                key={m.id}
-                className={`max-w-[85%] rounded-lg px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap ${
-                  m.role === "user"
-                    ? "ml-auto bg-muted text-foreground"
-                    : "border border-border bg-background"
-                }`}
-              >
-                {m.content}
-              </div>
+              <MessageBubble key={m.id} role={m.role} content={m.content} />
             ))}
             {thinking && <p className="text-sm text-muted-foreground">Counsel is thinking…</p>}
             <div ref={bottom} />
