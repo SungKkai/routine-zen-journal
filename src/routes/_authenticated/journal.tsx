@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentProps } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { journalReply } from "@/lib/journal-ai.functions";
@@ -295,7 +295,7 @@ function AutoTextarea({
   value,
   maxLines = 6,
   ...props
-}: React.ComponentProps<typeof Textarea> & { maxLines?: number }) {
+}: ComponentProps<typeof Textarea> & { maxLines?: number }) {
   const ref = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
