@@ -145,7 +145,7 @@ function JournalPage() {
       </header>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
-        <section className="space-y-6">
+        <section className="min-w-0 space-y-6">
           <div className="rounded-xl border border-border bg-card p-6">
             <p className="label-mono text-muted-foreground">Today&apos;s check-in</p>
 
@@ -219,7 +219,7 @@ function JournalPage() {
           </div>
         </section>
 
-        <section className="flex min-h-[28rem] flex-col rounded-xl border border-border bg-card">
+        <section className="flex min-h-[28rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <p className="label-mono text-muted-foreground">
               Counsel {activeEntry ? `· ${activeEntry.entry_date}` : ""}
@@ -231,7 +231,7 @@ function JournalPage() {
             )}
           </div>
 
-          <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
+          <div className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto px-5 py-5">
             {messages.length === 0 && !thinking && (
               <p className="text-sm text-muted-foreground">
                 Save a check-in to open the conversation. Counsel will push back where it disagrees.
@@ -324,8 +324,10 @@ function MessageBubble({ role, content }: { role: string; content: string }) {
 
   return (
     <div
-      className={`max-w-[85%] min-w-0 rounded-lg px-4 py-3 text-sm ${
-        role === "user" ? "ml-auto bg-muted text-foreground" : "border border-border bg-background"
+      className={`min-w-0 rounded-lg px-4 py-3 text-sm ${
+        role === "user"
+          ? "ml-auto max-w-[85%] bg-muted text-foreground"
+          : "w-full border border-border bg-background"
       }`}
     >
       <p
