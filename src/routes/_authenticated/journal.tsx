@@ -263,7 +263,7 @@ function JournalPage() {
                   void converse(entryId, text);
                 }}
               >
-                <Textarea
+                <AutoTextarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   placeholder={
