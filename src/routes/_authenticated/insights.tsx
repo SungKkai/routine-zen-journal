@@ -201,7 +201,7 @@ function InsightsPage() {
           </Button>
         </div>
         {thisWeekReflection ? (
-          <p className="mt-5 whitespace-pre-wrap text-sm leading-relaxed">
+          <p className="mt-5 text-sm leading-relaxed break-words whitespace-pre-wrap">
             {thisWeekReflection.content}
           </p>
         ) : (
@@ -221,7 +221,7 @@ function InsightsPage() {
               .map((r) => (
                 <article key={r.id}>
                   <p className="label-mono text-accent">Week of {r.week_start}</p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">
+                  <p className="mt-2 text-sm leading-relaxed break-words whitespace-pre-wrap text-muted-foreground">
                     {r.content}
                   </p>
                 </article>
