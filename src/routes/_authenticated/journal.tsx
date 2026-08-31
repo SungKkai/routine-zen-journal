@@ -269,7 +269,7 @@ function JournalPage() {
                   placeholder={
                     viewingPast ? "Continue this past thread…" : "Keep going — or push back."
                   }
-                  className="min-h-11 flex-1 resize-none"
+                  className="max-h-40 min-h-11 flex-1 resize-none overflow-y-auto break-words"
                   disabled={!entryId || thinking}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -286,6 +286,65 @@ function JournalPage() {
           </div>
         </section>
       </div>
+    </div>
+  );
+}
+
+/** Textarea that grows with its content up to a fixed line budget, then scrolls. */
+function AutoTextarea({
+  value,
+  maxLines = 6,
+  ...props
+}: React.ComponentProps<typeof Textarea> & { maxLines?: number }) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const styles = window.getComputedStyle(el);
+    const lineHeight = parseFloat(styles.lineHeight) || 20;
+    const padding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, lineHeight * maxLines + padding)}px`;
+  }, [value, maxLines]);
+
+  return <Textarea ref={ref} value={value} {...props} />;
+}
+
+/** Chat bubble clamped to a fixed line budget, expandable when it overflows. */
+function MessageBubble({ role, content }: { role: string; content: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [overflowing, setOverflowing] = useState(false);
+  const ref = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (el) setOverflowing(el.scrollHeight - el.clientHeight > 4);
+  }, [content]);
+
+  return (
+    <div
+      className={`max-w-[85%] min-w-0 rounded-lg px-4 py-3 text-sm ${
+        role === "user" ? "ml-auto bg-muted text-foreground" : "border border-border bg-background"
+      }`}
+    >
+      <p
+        ref={ref}
+        className={`leading-relaxed break-words whitespace-pre-wrap ${
+          expanded ? "" : "line-clamp-[12]"
+        }`}
+      >
+        {content}
+      </p>
+      {(overflowing || expanded) && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="label-mono mt-2 text-xs text-accent hover:underline"
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
+      )}
     </div>
   );
 }
