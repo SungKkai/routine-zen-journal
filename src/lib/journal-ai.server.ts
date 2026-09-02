@@ -57,11 +57,11 @@ export async function callCounsel(messages: Msg[]): Promise<string> {
 }
 
 export type Persona = {
-  assistant_name?: string;
-  tone?: string;
-  directness?: number;
-  reply_length?: string;
-  custom_instructions?: string | null;
+  assistant_name?: string | undefined;
+  tone?: string | undefined;
+  directness?: number | undefined;
+  reply_length?: string | undefined;
+  custom_instructions?: string | null | undefined;
 };
 
 /** Turns the user's saved preferences into an extra system message. */
