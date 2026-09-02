@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_settings: {
+        Row: {
+          assistant_name: string
+          created_at: string
+          custom_instructions: string | null
+          directness: number
+          id: string
+          reply_length: string
+          tone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assistant_name?: string
+          created_at?: string
+          custom_instructions?: string | null
+          directness?: number
+          id?: string
+          reply_length?: string
+          tone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assistant_name?: string
+          created_at?: string
+          custom_instructions?: string | null
+          directness?: number
+          id?: string
+          reply_length?: string
+          tone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string
