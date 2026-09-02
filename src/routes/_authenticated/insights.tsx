@@ -21,6 +21,7 @@ import {
   useJournalEntries,
   useReflections,
   useSaveReflection,
+  useAiSettings,
 } from "@/lib/wellbeing";
 import { weeklyReflection } from "@/lib/journal-ai.functions";
 import { addDays, startOfWeek, toDateKey } from "@/lib/format";
