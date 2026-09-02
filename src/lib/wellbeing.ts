@@ -276,3 +276,91 @@ export function useSaveReflection() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["reflections"] }),
   });
 }
+
+/* ------------------------------ ai settings ------------------------------ */
+
+export type AiSettings = Tables["ai_settings"]["Row"];
+
+export const AI_TONES = ["grounded", "warm", "clinical", "playful", "stoic"] as const;
+export const AI_LENGTHS = ["brief", "short", "detailed"] as const;
+
+export function useAiSettings() {
+  return useQuery({
+    queryKey: ["ai_settings"],
+    queryFn: async (): Promise<AiSettings | null> => {
+      const { data, error } = await supabase.from("ai_settings").select("*").maybeSingle();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
+}
+
+export function useSaveAiSettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      assistant_name: string;
+      tone: string;
+      directness: number;
+      reply_length: string;
+      custom_instructions: string | null;
+    }) => {
+      const user_id = await requireUserId();
+      const { error } = await supabase
+        .from("ai_settings")
+        .upsert({ ...input, user_id }, { onConflict: "user_id" });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["ai_settings"] }),
+  });
+}
+
+/* --------------------------- journal history ----------------------------- */
+
+export function useClearJournalMessages() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (entryId: string) => {
+      const { error } = await supabase.from("journal_messages").delete().eq("entry_id", entryId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: (_d, entryId) =>
+      qc.invalidateQueries({ queryKey: ["journal_messages", entryId] }),
+  });
+}
+
+export function useDeleteJournalEntry() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (entryId: string) => {
+      const { error: mErr } = await supabase
+        .from("journal_messages")
+        .delete()
+        .eq("entry_id", entryId);
+      if (mErr) throw new Error(mErr.message);
+      const { error } = await supabase.from("journal_entries").delete().eq("id", entryId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["journal_entries"] }),
+  });
+}
+
+export function useDeleteAllJournalHistory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const user_id = await requireUserId();
+      const { error: mErr } = await supabase
+        .from("journal_messages")
+        .delete()
+        .eq("user_id", user_id);
+      if (mErr) throw new Error(mErr.message);
+      const { error } = await supabase.from("journal_entries").delete().eq("user_id", user_id);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["journal_entries"] });
+      qc.invalidateQueries({ queryKey: ["journal_messages"] });
+    },
+  });
+}

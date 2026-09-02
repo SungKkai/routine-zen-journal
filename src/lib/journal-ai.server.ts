@@ -55,3 +55,44 @@ export async function callCounsel(messages: Msg[]): Promise<string> {
   if (!text) throw new Error("The model returned an empty response.");
   return text;
 }
+
+export type Persona = {
+  assistant_name?: string | undefined;
+  tone?: string | undefined;
+  directness?: number | undefined;
+  reply_length?: string | undefined;
+  custom_instructions?: string | null | undefined;
+};
+
+/** Turns the user's saved preferences into an extra system message. */
+export function personaOverlay(p: Persona | undefined): string | null {
+  if (!p) return null;
+  const lines: string[] = [];
+  if (p.assistant_name && p.assistant_name !== "Counsel")
+    lines.push(`Your name is "${p.assistant_name}" — use it instead of "Counsel".`);
+  if (p.tone) lines.push(`Preferred tone: ${p.tone}.`);
+  if (typeof p.directness === "number")
+    lines.push(
+      `Directness level ${p.directness}/5 — ${
+        p.directness >= 4
+          ? "be blunt and challenge them openly"
+          : p.directness <= 2
+            ? "be gentle and lead with encouragement before critique"
+            : "balance candour with care"
+      }.`,
+    );
+  if (p.reply_length)
+    lines.push(
+      `Reply length: ${
+        p.reply_length === "brief"
+          ? "under 80 words"
+          : p.reply_length === "detailed"
+            ? "250-400 words, still plain prose"
+            : "120-200 words"
+      }.`,
+    );
+  if (p.custom_instructions?.trim())
+    lines.push(`User's own instructions (follow them unless unsafe): ${p.custom_instructions.trim()}`);
+  if (lines.length === 0) return null;
+  return `USER CUSTOMISATION — these override the defaults above:\n- ${lines.join("\n- ")}`;
+}

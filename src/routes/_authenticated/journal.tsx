@@ -6,10 +6,14 @@ import { journalReply } from "@/lib/journal-ai.functions";
 import {
   MOODS,
   useAddJournalMessage,
+  useAiSettings,
+  useClearJournalMessages,
+  useDeleteJournalEntry,
   useJournalEntries,
   useJournalMessages,
   useUpsertCheckIn,
 } from "@/lib/wellbeing";
+import { AiSettingsDialog } from "@/components/ai-settings-dialog";
 import { useTasks } from "@/lib/data";
 import { toDateKey } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -40,7 +44,22 @@ function JournalPage() {
   const { data: tasks = [] } = useTasks();
   const upsert = useUpsertCheckIn();
   const addMessage = useAddJournalMessage();
+  const clearMessages = useClearJournalMessages();
+  const deleteEntry = useDeleteJournalEntry();
+  const { data: aiSettings } = useAiSettings();
+  const [customizing, setCustomizing] = useState(false);
   const ask = useServerFn(journalReply);
+
+  const persona = aiSettings
+    ? {
+        assistant_name: aiSettings.assistant_name,
+        tone: aiSettings.tone,
+        directness: aiSettings.directness,
+        reply_length: aiSettings.reply_length,
+        custom_instructions: aiSettings.custom_instructions,
+      }
+    : undefined;
+  const aiName = aiSettings?.assistant_name?.trim() || "Counsel";
 
   const todayEntry = useMemo(
     () => entries.find((e) => e.entry_date === today) ?? null,
@@ -94,7 +113,9 @@ function JournalPage() {
         ...messages.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
         { role: "user" as const, content: userText },
       ];
-      const { reply } = await ask({ data: { context: contextLine(), messages: history } });
+      const { reply } = await ask({
+        data: { context: contextLine(), messages: history, persona },
+      });
       await addMessage.mutateAsync({ entry_id: entry, role: "assistant", content: reply });
       setClosed(false);
     } catch (e) {
@@ -131,6 +152,27 @@ function JournalPage() {
     }
   }
 
+  async function clearThread() {
+    if (!entryId) return;
+    try {
+      await clearMessages.mutateAsync(entryId);
+      setClosed(false);
+      toast.success("Conversation cleared.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't clear that conversation.");
+    }
+  }
+
+  async function removeEntry(id: string) {
+    try {
+      await deleteEntry.mutateAsync(id);
+      if (entryId === id) setActiveId(null);
+      toast.success("Entry deleted.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Couldn't delete that entry.");
+    }
+  }
+
   const viewingPast = activeEntry && activeEntry.entry_date !== today;
 
   return (
@@ -142,7 +184,12 @@ function JournalPage() {
           Log where you are, then think it through with Counsel — a counterpart with its own read
           on things, not a mirror.
         </p>
+        <Button variant="outline" size="sm" className="mt-4" onClick={() => setCustomizing(true)}>
+          Customize {aiName}
+        </Button>
       </header>
+
+      <AiSettingsDialog open={customizing} onOpenChange={setCustomizing} />
 
       <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
         <section className="min-w-0 space-y-6">
@@ -201,10 +248,10 @@ function JournalPage() {
                 <li className="py-4 text-sm text-muted-foreground">No entries yet.</li>
               )}
               {entries.map((e) => (
-                <li key={e.id}>
+                <li key={e.id} className="flex items-center gap-2">
                   <button
                     onClick={() => setActiveId(e.id)}
-                    className={`flex w-full items-baseline gap-3 py-3 text-left ${
+                    className={`flex min-w-0 flex-1 items-baseline gap-3 py-3 text-left ${
                       e.id === entryId ? "" : "opacity-70"
                     }`}
                   >
@@ -212,6 +259,13 @@ function JournalPage() {
                     <span className="flex-1 truncate text-sm">
                       {e.note || MOODS.find((m) => m.value === e.mood)?.label || "Check-in"}
                     </span>
+                  </button>
+                  <button
+                    aria-label={`Delete entry ${e.entry_date}`}
+                    onClick={() => void removeEntry(e.id)}
+                    className="shrink-0 px-2 text-xs text-muted-foreground hover:text-destructive"
+                  >
+                    Delete
                   </button>
                 </li>
               ))}
@@ -222,25 +276,32 @@ function JournalPage() {
         <section className="flex min-h-[28rem] min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
           <div className="flex items-center justify-between border-b border-border px-5 py-3">
             <p className="label-mono text-muted-foreground">
-              Counsel {activeEntry ? `· ${activeEntry.entry_date}` : ""}
+              {aiName} {activeEntry ? `· ${activeEntry.entry_date}` : ""}
             </p>
-            {messages.length > 0 && !closed && (
-              <Button size="sm" variant="ghost" onClick={() => setClosed(true)}>
-                Done for now
-              </Button>
-            )}
+            <div className="flex items-center gap-1">
+              {messages.length > 0 && (
+                <Button size="sm" variant="ghost" onClick={() => void clearThread()}>
+                  Clear chat
+                </Button>
+              )}
+              {messages.length > 0 && !closed && (
+                <Button size="sm" variant="ghost" onClick={() => setClosed(true)}>
+                  Done for now
+                </Button>
+              )}
+            </div>
           </div>
 
           <div className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto px-5 py-5">
             {messages.length === 0 && !thinking && (
               <p className="text-sm text-muted-foreground">
-                Save a check-in to open the conversation. Counsel will push back where it disagrees.
+                Save a check-in to open the conversation. {aiName} will push back where it disagrees.
               </p>
             )}
             {messages.map((m) => (
               <MessageBubble key={m.id} role={m.role} content={m.content} />
             ))}
-            {thinking && <p className="text-sm text-muted-foreground">Counsel is thinking…</p>}
+            {thinking && <p className="text-sm text-muted-foreground">{aiName} is thinking…</p>}
             <div ref={bottom} />
           </div>
 

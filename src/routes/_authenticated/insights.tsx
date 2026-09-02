@@ -21,6 +21,7 @@ import {
   useJournalEntries,
   useReflections,
   useSaveReflection,
+  useAiSettings,
 } from "@/lib/wellbeing";
 import { weeklyReflection } from "@/lib/journal-ai.functions";
 import { addDays, startOfWeek, toDateKey } from "@/lib/format";
@@ -54,6 +55,7 @@ function InsightsPage() {
   const { data: reflections = [] } = useReflections();
   const saveReflection = useSaveReflection();
   const reflect = useServerFn(weeklyReflection);
+  const { data: aiSettings } = useAiSettings();
   const [busy, setBusy] = useState(false);
 
   const weekStart = startOfWeek(new Date());
@@ -116,7 +118,20 @@ function InsightsPage() {
         journalLines ? `Journal:\n${journalLines}` : "No journal entries.",
       ].join("\n");
 
-      const { reply } = await reflect({ data: { summary } });
+      const { reply } = await reflect({
+        data: {
+          summary,
+          persona: aiSettings
+            ? {
+                assistant_name: aiSettings.assistant_name,
+                tone: aiSettings.tone,
+                directness: aiSettings.directness,
+                reply_length: aiSettings.reply_length,
+                custom_instructions: aiSettings.custom_instructions,
+              }
+            : undefined,
+        },
+      });
       await saveReflection.mutateAsync({ week_start: weekKey, content: reply });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Couldn't generate a reflection.");
