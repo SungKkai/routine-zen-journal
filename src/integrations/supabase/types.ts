@@ -74,6 +74,42 @@ export type Database = {
         }
         Relationships: []
       }
+      goals: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          status: Database["public"]["Enums"]["goal_status"]
+          target_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          status?: Database["public"]["Enums"]["goal_status"]
+          target_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          status?: Database["public"]["Enums"]["goal_status"]
+          target_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       habit_logs: {
         Row: {
           created_at: string
@@ -308,6 +344,7 @@ export type Database = {
           description: string | null
           due_date: string | null
           due_time: string | null
+          goal_id: string | null
           id: string
           priority: Database["public"]["Enums"]["task_priority"]
           status: Database["public"]["Enums"]["task_status"]
@@ -322,6 +359,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           due_time?: string | null
+          goal_id?: string | null
           id?: string
           priority?: Database["public"]["Enums"]["task_priority"]
           status?: Database["public"]["Enums"]["task_status"]
@@ -336,6 +374,7 @@ export type Database = {
           description?: string | null
           due_date?: string | null
           due_time?: string | null
+          goal_id?: string | null
           id?: string
           priority?: Database["public"]["Enums"]["task_priority"]
           status?: Database["public"]["Enums"]["task_status"]
@@ -349,6 +388,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
             referencedColumns: ["id"]
           },
         ]
@@ -399,6 +445,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      goal_status: "active" | "paused" | "done"
       recurrence: "none" | "daily" | "weekdays" | "weekly"
       task_priority: "low" | "medium" | "high"
       task_status: "not_started" | "in_progress" | "done"
@@ -529,6 +576,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      goal_status: ["active", "paused", "done"],
       recurrence: ["none", "daily", "weekdays", "weekly"],
       task_priority: ["low", "medium", "high"],
       task_status: ["not_started", "in_progress", "done"],
