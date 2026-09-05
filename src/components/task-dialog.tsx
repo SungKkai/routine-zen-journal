@@ -32,21 +32,26 @@ import {
 } from "@/lib/data";
 import { useTimer } from "@/components/timer-provider";
 import { CategoryDialog } from "@/components/category-dialog";
+import { useGoals } from "@/lib/goals";
 
 const NO_CATEGORY = "__none__";
+const NO_GOAL = "__none__";
 
 export function TaskDialog({
   open,
   onOpenChange,
   task,
   defaultDate,
+  defaultGoalId,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   task?: Task | null;
   defaultDate?: string | null;
+  defaultGoalId?: string | null;
 }) {
   const { data: categories = [] } = useCategories();
+  const { data: goals = [] } = useGoals();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -59,6 +64,7 @@ export function TaskDialog({
   const [categoryId, setCategoryId] = useState<string>(NO_CATEGORY);
   const [dueDate, setDueDate] = useState("");
   const [dueTime, setDueTime] = useState("");
+  const [goalId, setGoalId] = useState<string>(NO_GOAL);
   const [categoryOpen, setCategoryOpen] = useState(false);
 
   useEffect(() => {
@@ -70,7 +76,8 @@ export function TaskDialog({
     setCategoryId(task?.category_id ?? NO_CATEGORY);
     setDueDate(task?.due_date ?? defaultDate ?? "");
     setDueTime(task?.due_time ? task.due_time.slice(0, 5) : "");
-  }, [open, task, defaultDate]);
+    setGoalId(task?.goal_id ?? defaultGoalId ?? NO_GOAL);
+  }, [open, task, defaultDate, defaultGoalId]);
 
   const saving = createTask.isPending || updateTask.isPending;
 
@@ -83,6 +90,7 @@ export function TaskDialog({
       priority,
       status,
       category_id: categoryId === NO_CATEGORY ? null : categoryId,
+      goal_id: goalId === NO_GOAL ? null : goalId,
       due_date: dueDate || null,
       due_time: dueTime || null,
       completed_at: status === "done" ? (task?.completed_at ?? new Date().toISOString()) : null,
@@ -177,6 +185,28 @@ export function TaskDialog({
                   +
                 </Button>
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Goal</Label>
+              <Select value={goalId} onValueChange={setGoalId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_GOAL}>No goal</SelectItem>
+                  {goals.map((g) => (
+                    <SelectItem key={g.id} value={g.id}>
+                      <span className="flex items-center gap-2">
+                        <span
+                          className="size-2.5 rounded-full"
+                          style={{ backgroundColor: g.color }}
+                        />
+                        {g.name}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="task-date">Due date</Label>
