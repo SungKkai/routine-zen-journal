@@ -4,6 +4,7 @@ import { useTasks, type Task } from "@/lib/data";
 import { GOAL_STATUSES, useGoals, type Goal, type GoalStatus } from "@/lib/goals";
 import { GoalDialog } from "@/components/goal-dialog";
 import { TaskDialog } from "@/components/task-dialog";
+import { GoalShare } from "@/components/goal-share";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
