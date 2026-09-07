@@ -93,6 +93,34 @@ function InsightsPage() {
   const avgMood = moods.length ? Math.round((moods.reduce((a, b) => a + b, 0) / moods.length) * 10) / 10 : null;
   const thisWeekReflection = reflections.find((r) => r.week_start === weekKey);
 
+  const heatDays = useMemo(
+    () => Array.from({ length: 56 }, (_, i) => toDateKey(addDays(new Date(), i - 55))),
+    [],
+  );
+
+  const goalPace = useMemo(() => {
+    const cutoff = toDateKey(addDays(new Date(), -28));
+    return goals
+      .filter((g) => g.status === "active")
+      .map((g) => {
+        const own = tasks.filter((t) => t.goal_id === g.id);
+        const done = own.filter((t) => t.status === "done").length;
+        const recent = own.filter(
+          (t) => t.status === "done" && (t.completed_at ?? "").slice(0, 10) >= cutoff,
+        ).length;
+        const perWeek = Math.round((recent / 4) * 10) / 10;
+        const left = own.length - done;
+        const eta =
+          left === 0
+            ? "complete"
+            : perWeek > 0
+              ? `~${Math.ceil(left / perWeek)} wks left`
+              : "no recent pace";
+        return { id: g.id, name: g.name, done, total: own.length, perWeek, eta };
+      })
+      .filter((g) => g.total > 0);
+  }, [goals, tasks]);
+
   async function generate() {
     setBusy(true);
     try {
