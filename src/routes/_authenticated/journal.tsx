@@ -14,6 +14,7 @@ import {
   useUpsertCheckIn,
 } from "@/lib/wellbeing";
 import { AiSettingsDialog } from "@/components/ai-settings-dialog";
+import { JournalTasks } from "@/components/journal-tasks";
 import { useTasks } from "@/lib/data";
 import { toDateKey } from "@/lib/format";
 import { Button } from "@/components/ui/button";
