@@ -205,6 +205,57 @@ function InsightsPage() {
         </div>
       </section>
 
+      <section className="rounded-xl border border-border bg-card p-5">
+        <p className="label-mono text-muted-foreground">Habit consistency · 8 weeks</p>
+        {habits.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">No habits tracked yet.</p>
+        ) : (
+          <div className="mt-4 space-y-4 overflow-x-auto">
+            {habits.map((habit) => (
+              <div key={habit.id} className="flex items-center gap-4">
+                <span className="w-32 shrink-0 truncate text-sm">{habit.name}</span>
+                <div className="flex gap-1">
+                  {heatDays.map((day) => {
+                    const hit = logs.some((l) => l.habit_id === habit.id && l.log_date === day);
+                    return (
+                      <span
+                        key={day}
+                        title={`${day}${hit ? " · done" : ""}`}
+                        className="size-3 rounded-[3px] border border-border"
+                        style={hit ? { backgroundColor: habit.color, borderColor: habit.color } : undefined}
+                      />
+                    );
+                  })}
+                </div>
+                <span className="label-mono shrink-0 text-muted-foreground">
+                  {streakFor(logs, habit.id)}d streak
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-5">
+        <p className="label-mono text-muted-foreground">Goal pace</p>
+        {goalPace.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">No active goals with tasks yet.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-border border-t border-border">
+            {goalPace.map((g) => (
+              <li key={g.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3">
+                <span className="min-w-0 flex-1 truncate text-sm font-medium">{g.name}</span>
+                <span className="label-mono text-muted-foreground">
+                  {g.done}/{g.total} done
+                </span>
+                <span className="label-mono text-accent">{g.perWeek}/wk last 4 weeks</span>
+                <span className="label-mono text-muted-foreground">{g.eta}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <section className="rounded-xl border border-border bg-card p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
