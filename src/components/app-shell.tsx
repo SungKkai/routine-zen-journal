@@ -143,6 +143,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <QuickAdd />
       <CommandPalette />
+      <RemindersProvider />
     </div>
   );
 }
