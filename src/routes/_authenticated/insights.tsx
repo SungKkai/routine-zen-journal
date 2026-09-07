@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { useTasks, useTimerSessions } from "@/lib/data";
+import { useGoals } from "@/lib/goals";
 import {
   streakFor,
   useHabitLogs,
@@ -52,6 +53,7 @@ function InsightsPage() {
   const { data: entries = [] } = useJournalEntries();
   const { data: habits = [] } = useHabits();
   const { data: logs = [] } = useHabitLogs();
+  const { data: goals = [] } = useGoals();
   const { data: reflections = [] } = useReflections();
   const saveReflection = useSaveReflection();
   const reflect = useServerFn(weeklyReflection);
@@ -92,6 +94,34 @@ function InsightsPage() {
   const moods = series.slice(-7).map((d) => d.mood).filter((m): m is number => m !== null);
   const avgMood = moods.length ? Math.round((moods.reduce((a, b) => a + b, 0) / moods.length) * 10) / 10 : null;
   const thisWeekReflection = reflections.find((r) => r.week_start === weekKey);
+
+  const heatDays = useMemo(
+    () => Array.from({ length: 56 }, (_, i) => toDateKey(addDays(new Date(), i - 55))),
+    [],
+  );
+
+  const goalPace = useMemo(() => {
+    const cutoff = toDateKey(addDays(new Date(), -28));
+    return goals
+      .filter((g) => g.status === "active")
+      .map((g) => {
+        const own = tasks.filter((t) => t.goal_id === g.id);
+        const done = own.filter((t) => t.status === "done").length;
+        const recent = own.filter(
+          (t) => t.status === "done" && (t.completed_at ?? "").slice(0, 10) >= cutoff,
+        ).length;
+        const perWeek = Math.round((recent / 4) * 10) / 10;
+        const left = own.length - done;
+        const eta =
+          left === 0
+            ? "complete"
+            : perWeek > 0
+              ? `~${Math.ceil(left / perWeek)} wks left`
+              : "no recent pace";
+        return { id: g.id, name: g.name, done, total: own.length, perWeek, eta };
+      })
+      .filter((g) => g.total > 0);
+  }, [goals, tasks]);
 
   async function generate() {
     setBusy(true);
@@ -203,6 +233,57 @@ function InsightsPage() {
             </ResponsiveContainer>
           </div>
         </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-5">
+        <p className="label-mono text-muted-foreground">Habit consistency · 8 weeks</p>
+        {habits.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">No habits tracked yet.</p>
+        ) : (
+          <div className="mt-4 space-y-4 overflow-x-auto">
+            {habits.map((habit) => (
+              <div key={habit.id} className="flex items-center gap-4">
+                <span className="w-32 shrink-0 truncate text-sm">{habit.name}</span>
+                <div className="flex gap-1">
+                  {heatDays.map((day) => {
+                    const hit = logs.some((l) => l.habit_id === habit.id && l.log_date === day);
+                    return (
+                      <span
+                        key={day}
+                        title={`${day}${hit ? " · done" : ""}`}
+                        className="size-3 rounded-[3px] border border-border"
+                        style={hit ? { backgroundColor: habit.color, borderColor: habit.color } : undefined}
+                      />
+                    );
+                  })}
+                </div>
+                <span className="label-mono shrink-0 text-muted-foreground">
+                  {streakFor(logs, habit.id)}d streak
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-5">
+        <p className="label-mono text-muted-foreground">Goal pace</p>
+        {goalPace.length === 0 ? (
+          <p className="mt-4 text-sm text-muted-foreground">No active goals with tasks yet.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-border border-t border-border">
+            {goalPace.map((g) => (
+              <li key={g.id} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-3">
+                <span className="min-w-0 flex-1 truncate text-sm font-medium">{g.name}</span>
+                <span className="label-mono text-muted-foreground">
+                  {g.done}/{g.total} done
+                </span>
+                <span className="label-mono text-accent">{g.perWeek}/wk last 4 weeks</span>
+                <span className="label-mono text-muted-foreground">{g.eta}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="rounded-xl border border-border bg-card p-6">

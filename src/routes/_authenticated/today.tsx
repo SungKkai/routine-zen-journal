@@ -12,6 +12,7 @@ import {
 import { formatClock, formatTime, greeting, toDateKey } from "@/lib/format";
 import { useTimer } from "@/components/timer-provider";
 import { TaskDialog } from "@/components/task-dialog";
+import { DayPlan } from "@/components/day-plan";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -115,6 +116,8 @@ function TodayPage() {
           </div>
         </div>
       </section>
+
+      <DayPlan tasks={todaysTasks} routines={todaysRoutine} />
 
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <section>

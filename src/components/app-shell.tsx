@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/data";
 import { QuickAdd } from "@/components/quick-add";
 import { CommandPalette } from "@/components/command-palette";
+import { RemindersProvider } from "@/components/reminders-provider";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -143,6 +144,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <QuickAdd />
       <CommandPalette />
+      <RemindersProvider />
     </div>
   );
 }

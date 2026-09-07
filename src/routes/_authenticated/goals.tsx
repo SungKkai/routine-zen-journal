@@ -4,6 +4,7 @@ import { useTasks, type Task } from "@/lib/data";
 import { GOAL_STATUSES, useGoals, type Goal, type GoalStatus } from "@/lib/goals";
 import { GoalDialog } from "@/components/goal-dialog";
 import { TaskDialog } from "@/components/task-dialog";
+import { GoalShare } from "@/components/goal-share";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
@@ -136,13 +137,16 @@ function GoalsPage() {
                   )}
                 </ul>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="label-mono text-muted-foreground">
                     {goal.target_date ? `Due ${goal.target_date}` : "No target date"}
                   </span>
-                  <Button size="sm" variant="outline" onClick={() => setTaskGoalId(goal.id)}>
-                    Add task
-                  </Button>
+                  <span className="flex items-center gap-1">
+                    <GoalShare goalId={goal.id} />
+                    <Button size="sm" variant="outline" onClick={() => setTaskGoalId(goal.id)}>
+                      Add task
+                    </Button>
+                  </span>
                 </div>
               </article>
             );
