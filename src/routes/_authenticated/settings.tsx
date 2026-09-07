@@ -140,6 +140,8 @@ function SettingsPage() {
         </form>
       </section>
 
+      <ReminderSettings />
+
       <DataExport />
     </div>
   );
