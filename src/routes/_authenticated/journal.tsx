@@ -345,6 +345,8 @@ function JournalPage() {
               </form>
             )}
           </div>
+
+          <JournalTasks messages={messages} />
         </section>
       </div>
     </div>
