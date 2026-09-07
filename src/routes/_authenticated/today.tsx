@@ -116,6 +116,8 @@ function TodayPage() {
         </div>
       </section>
 
+      <DayPlan tasks={todaysTasks} routines={todaysRoutine} />
+
       <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
         <section>
           <h2 className="label-mono text-muted-foreground">Tasks</h2>
