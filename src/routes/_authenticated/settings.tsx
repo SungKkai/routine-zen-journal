@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DataExport } from "@/components/data-export";
+import { ReminderSettings } from "@/components/reminder-settings";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
