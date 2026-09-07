@@ -14,6 +14,7 @@ import {
   YAxis,
 } from "recharts";
 import { useTasks, useTimerSessions } from "@/lib/data";
+import { useGoals } from "@/lib/goals";
 import {
   streakFor,
   useHabitLogs,
@@ -52,6 +53,7 @@ function InsightsPage() {
   const { data: entries = [] } = useJournalEntries();
   const { data: habits = [] } = useHabits();
   const { data: logs = [] } = useHabitLogs();
+  const { data: goals = [] } = useGoals();
   const { data: reflections = [] } = useReflections();
   const saveReflection = useSaveReflection();
   const reflect = useServerFn(weeklyReflection);
