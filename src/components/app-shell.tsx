@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import {
   CalendarDays,
+  ClipboardCheck,
   LineChart,
   ListChecks,
   NotebookPen,
@@ -33,6 +34,7 @@ const NAV = [
   { to: "/habits", label: "Habits", icon: Repeat },
   { to: "/journal", label: "Journal", icon: NotebookPen },
   { to: "/insights", label: "Insights", icon: LineChart },
+  { to: "/review", label: "Review", icon: ClipboardCheck },
 ] as const;
 
 const MOBILE_NAV = NAV.filter((item) =>
