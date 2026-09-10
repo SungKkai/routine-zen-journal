@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { TimerProvider } from "@/components/timer-provider";
+import { OfflineBanner } from "@/components/offline-banner";
+import { persistCache, registerServiceWorker } from "@/lib/offline";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -140,9 +142,15 @@ function RootComponent() {
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
 
+  useEffect(() => {
+    registerServiceWorker();
+    void persistCache(queryClient);
+  }, [queryClient]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TimerProvider>
+        <OfflineBanner />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
         <Toaster position="top-center" />

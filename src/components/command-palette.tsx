@@ -24,6 +24,7 @@ const PAGES = [
   { to: "/habits", label: "Habits" },
   { to: "/journal", label: "Journal" },
   { to: "/insights", label: "Insights" },
+  { to: "/review", label: "Weekly review" },
   { to: "/settings", label: "Settings" },
 ] as const;
 
