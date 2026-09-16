@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import {
   CalendarDays,
+  ChevronDown,
   ClipboardCheck,
   LineChart,
   ListChecks,
@@ -17,6 +18,7 @@ import { useProfile } from "@/lib/data";
 import { QuickAdd } from "@/components/quick-add";
 import { CommandPalette } from "@/components/command-palette";
 import { RemindersProvider } from "@/components/reminders-provider";
+import { TimerBar } from "@/components/timer-bar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,9 +39,11 @@ const NAV = [
   { to: "/review", label: "Review", icon: ClipboardCheck },
 ] as const;
 
-const MOBILE_NAV = NAV.filter((item) =>
-  ["/today", "/tasks", "/calendar", "/goals", "/journal"].includes(item.to),
-);
+const PRIMARY_PATHS = ["/today", "/tasks", "/calendar", "/goals", "/journal"];
+
+const MOBILE_NAV = NAV.filter((item) => PRIMARY_PATHS.includes(item.to));
+const PRIMARY_NAV = MOBILE_NAV;
+const SECONDARY_NAV = NAV.filter((item) => !PRIMARY_PATHS.includes(item.to));
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -74,7 +78,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             Kronos
           </Link>
           <div className="hidden items-center gap-5 text-sm font-medium text-muted-foreground lg:flex">
-            {NAV.map((item) => (
+            {PRIMARY_NAV.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
@@ -84,6 +88,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {item.label}
               </Link>
             ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 transition-colors hover:text-foreground">
+                More
+                <ChevronDown className="size-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-44">
+                {SECONDARY_NAV.map((item) => (
+                  <DropdownMenuItem key={item.to} asChild>
+                    <Link to={item.to}>{item.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -144,6 +161,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         ))}
       </nav>
 
+      <TimerBar />
       <QuickAdd />
       <CommandPalette />
       <RemindersProvider />

@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { TimerProvider } from "@/components/timer-provider";
 import { OfflineBanner } from "@/components/offline-banner";
+import { SyncProvider } from "@/components/sync-provider";
 import { persistCache, registerServiceWorker } from "@/lib/offline";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -150,6 +151,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <TimerProvider>
+        <SyncProvider />
         <OfflineBanner />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
