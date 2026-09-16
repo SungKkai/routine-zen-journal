@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { isOffline, localId, queueMutation, type SyncTable } from "@/lib/sync-queue";
 
 type Tables = Database["public"]["Tables"];
 
