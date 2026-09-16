@@ -37,9 +37,11 @@ const NAV = [
   { to: "/review", label: "Review", icon: ClipboardCheck },
 ] as const;
 
-const MOBILE_NAV = NAV.filter((item) =>
-  ["/today", "/tasks", "/calendar", "/goals", "/journal"].includes(item.to),
-);
+const PRIMARY_PATHS = ["/today", "/tasks", "/calendar", "/goals", "/journal"];
+
+const MOBILE_NAV = NAV.filter((item) => PRIMARY_PATHS.includes(item.to));
+const PRIMARY_NAV = MOBILE_NAV;
+const SECONDARY_NAV = NAV.filter((item) => !PRIMARY_PATHS.includes(item.to));
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
