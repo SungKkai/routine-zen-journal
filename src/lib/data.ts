@@ -40,6 +40,46 @@ async function requireUserId() {
   return id;
 }
 
+/** Last signed-in user id, cached so offline edits can still be attributed. */
+async function offlineUserId() {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const id = data.session?.user.id;
+    if (id) {
+      window.localStorage.setItem("kronos.user-id", id);
+      return id;
+    }
+  } catch {
+    /* fall back to the cached id */
+  }
+  const cached = window.localStorage.getItem("kronos.user-id");
+  if (!cached) throw new Error("You need to be signed in to do that.");
+  return cached;
+}
+
+/* -------------------------- offline cache helpers -------------------------- */
+
+const KEYS: Record<SyncTable, string> = { tasks: "tasks", routine_entries: "routine_entries" };
+
+function cacheInsert<T extends { id: string }>(qc: QueryClient, table: SyncTable, row: T) {
+  qc.setQueryData<T[]>([KEYS[table]], (rows = []) => [row, ...rows]);
+}
+
+function cacheUpdate<T extends { id: string }>(
+  qc: QueryClient,
+  table: SyncTable,
+  id: string,
+  patch: Partial<T>,
+) {
+  qc.setQueryData<T[]>([KEYS[table]], (rows = []) =>
+    rows.map((row) => (row.id === id ? { ...row, ...patch } : row)),
+  );
+}
+
+function cacheDelete<T extends { id: string }>(qc: QueryClient, table: SyncTable, id: string) {
+  qc.setQueryData<T[]>([KEYS[table]], (rows = []) => rows.filter((row) => row.id !== id));
+}
+
 /* ---------------------------------- tasks --------------------------------- */
 
 export function useTasks() {
@@ -61,6 +101,33 @@ export function useCreateTask() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: TaskInsert) => {
+      if (isOffline()) {
+        const user_id = await offlineUserId();
+        const row = {
+          id: localId(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          completed_at: null,
+          category_id: null,
+          goal_id: null,
+          description: null,
+          due_date: null,
+          due_time: null,
+          duration_minutes: null,
+          priority: "medium" as Priority,
+          status: "not_started" as Status,
+          ...input,
+          user_id,
+        } as Task;
+        queueMutation({
+          table: "tasks",
+          op: "insert",
+          rowId: row.id,
+          payload: { ...input, user_id },
+        });
+        cacheInsert<Task>(qc, "tasks", row);
+        return row;
+      }
       const user_id = await requireUserId();
       const { data, error } = await supabase
         .from("tasks")
@@ -70,7 +137,9 @@ export function useCreateTask() {
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
+    onSuccess: () => {
+      if (!isOffline()) qc.invalidateQueries({ queryKey: ["tasks"] });
+    },
   });
 }
 
@@ -78,6 +147,11 @@ export function useUpdateTask() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...patch }: Partial<Task> & { id: string }) => {
+      if (isOffline()) {
+        queueMutation({ table: "tasks", op: "update", rowId: id, payload: patch });
+        cacheUpdate<Task>(qc, "tasks", id, patch);
+        return null;
+      }
       const { data, error } = await supabase
         .from("tasks")
         .update(patch)
@@ -87,7 +161,9 @@ export function useUpdateTask() {
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
+    onSuccess: () => {
+      if (!isOffline()) qc.invalidateQueries({ queryKey: ["tasks"] });
+    },
   });
 }
 
@@ -95,10 +171,17 @@ export function useDeleteTask() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (isOffline()) {
+        queueMutation({ table: "tasks", op: "delete", rowId: id });
+        cacheDelete<Task>(qc, "tasks", id);
+        return;
+      }
       const { error } = await supabase.from("tasks").delete().eq("id", id);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["tasks"] }),
+    onSuccess: () => {
+      if (!isOffline()) qc.invalidateQueries({ queryKey: ["tasks"] });
+    },
   });
 }
 
@@ -181,6 +264,26 @@ export function useCreateRoutine() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: RoutineInsert) => {
+      if (isOffline()) {
+        const user_id = await offlineUserId();
+        const row = {
+          id: localId(),
+          created_at: new Date().toISOString(),
+          entry_time: null,
+          duration_minutes: null,
+          notes: null,
+          ...input,
+          user_id,
+        } as RoutineEntry;
+        queueMutation({
+          table: "routine_entries",
+          op: "insert",
+          rowId: row.id,
+          payload: { ...input, user_id },
+        });
+        cacheInsert<RoutineEntry>(qc, "routine_entries", row);
+        return row;
+      }
       const user_id = await requireUserId();
       const { data, error } = await supabase
         .from("routine_entries")
@@ -190,7 +293,9 @@ export function useCreateRoutine() {
       if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["routine_entries"] }),
+    onSuccess: () => {
+      if (!isOffline()) qc.invalidateQueries({ queryKey: ["routine_entries"] });
+    },
   });
 }
 
@@ -198,10 +303,17 @@ export function useUpdateRoutine() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...patch }: Partial<RoutineEntry> & { id: string }) => {
+      if (isOffline()) {
+        queueMutation({ table: "routine_entries", op: "update", rowId: id, payload: patch });
+        cacheUpdate<RoutineEntry>(qc, "routine_entries", id, patch);
+        return;
+      }
       const { error } = await supabase.from("routine_entries").update(patch).eq("id", id);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["routine_entries"] }),
+    onSuccess: () => {
+      if (!isOffline()) qc.invalidateQueries({ queryKey: ["routine_entries"] });
+    },
   });
 }
 
@@ -209,10 +321,17 @@ export function useDeleteRoutine() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      if (isOffline()) {
+        queueMutation({ table: "routine_entries", op: "delete", rowId: id });
+        cacheDelete<RoutineEntry>(qc, "routine_entries", id);
+        return;
+      }
       const { error } = await supabase.from("routine_entries").delete().eq("id", id);
       if (error) throw new Error(error.message);
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["routine_entries"] }),
+    onSuccess: () => {
+      if (!isOffline()) qc.invalidateQueries({ queryKey: ["routine_entries"] });
+    },
   });
 }
 
