@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import {
@@ -12,6 +12,7 @@ import {
   Search,
   Sun,
   Target,
+  Trophy,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/lib/data";
@@ -37,6 +38,7 @@ const NAV = [
   { to: "/journal", label: "Journal", icon: NotebookPen },
   { to: "/insights", label: "Insights", icon: LineChart },
   { to: "/review", label: "Review", icon: ClipboardCheck },
+  { to: "/rewards", label: "Rewards", icon: Trophy },
 ] as const;
 
 const PRIMARY_PATHS = ["/today", "/tasks", "/calendar", "/goals", "/journal"];
@@ -47,6 +49,7 @@ const SECONDARY_NAV = NAV.filter((item) => !PRIMARY_PATHS.includes(item.to));
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
+  const isToday = useRouterState({ select: (s) => s.location.pathname === "/today" });
   const queryClient = useQueryClient();
   const { data: profile } = useProfile();
 
@@ -161,7 +164,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         ))}
       </nav>
 
-      <TimerBar />
+       {!isToday && <TimerBar />}
       <QuickAdd />
       <CommandPalette />
       <RemindersProvider />

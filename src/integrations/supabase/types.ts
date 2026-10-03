@@ -50,6 +50,57 @@ export type Database = {
         }
         Relationships: []
       }
+      app_user_connections: {
+        Row: {
+          connection_key_ciphertext: string
+          connector_id: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connection_key_ciphertext: string
+          connector_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connection_key_ciphertext?: string
+          connector_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      calendar_links: {
+        Row: {
+          google_event_id: string
+          google_updated_at: string | null
+          local_id: string
+          local_kind: string
+          user_id: string
+        }
+        Insert: {
+          google_event_id: string
+          google_updated_at?: string | null
+          local_id: string
+          local_kind: string
+          user_id: string
+        }
+        Update: {
+          google_event_id?: string
+          google_updated_at?: string | null
+          local_id?: string
+          local_kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string
@@ -275,9 +326,26 @@ export type Database = {
           },
         ]
       }
+      login_days: {
+        Row: {
+          login_date: string
+          user_id: string
+        }
+        Insert: {
+          login_date: string
+          user_id: string
+        }
+        Update: {
+          login_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          avatar_key: string
           avatar_url: string | null
+          background_key: string
           created_at: string
           display_name: string | null
           id: string
@@ -285,7 +353,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_key?: string
           avatar_url?: string | null
+          background_key?: string
           created_at?: string
           display_name?: string | null
           id?: string
@@ -293,7 +363,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_key?: string
           avatar_url?: string | null
+          background_key?: string
           created_at?: string
           display_name?: string | null
           id?: string
