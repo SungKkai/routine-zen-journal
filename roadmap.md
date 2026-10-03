@@ -9,3 +9,6 @@
 
 ## Open
 - Email reminders — blocked: needs a sender domain the user owns
+- Calendar redesign, two-way Google Calendar connection, achievements/rewards, backgrounds, unlockable avatars
+- Show the timer once: on the right of Today, floating on other pages
+- Verify offline queue, timer, and navigation changes
