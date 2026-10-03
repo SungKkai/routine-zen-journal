@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791008998728,
+      "tag": "0000_kronos_rewards_preferences_calendar_connections",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_key text NOT NULL DEFAULT 'wanderer', ADD COLUMN IF NOT EXISTS background_key text NOT NULL DEFAULT 'plain';
+CREATE TABLE public.login_days (user_id uuid NOT NULL, login_date date NOT NULL, PRIMARY KEY (user_id, login_date));
+GRANT SELECT, INSERT ON public.login_days TO authenticated;
+GRANT ALL ON public.login_days TO service_role;
+ALTER TABLE public.login_days ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "own login days read" ON public.login_days FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "own login days insert" ON public.login_days FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE TABLE public.app_user_connections (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), user_id uuid NOT NULL, connector_id text NOT NULL, connection_key_ciphertext text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now(), UNIQUE (user_id, connector_id));
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.app_user_connections TO service_role;
+ALTER TABLE public.app_user_connections ENABLE ROW LEVEL SECURITY;
+CREATE TABLE public.calendar_links (user_id uuid NOT NULL, local_id uuid NOT NULL, local_kind text NOT NULL CHECK (local_kind IN ('task','routine')), google_event_id text NOT NULL, google_updated_at timestamptz, PRIMARY KEY (user_id, local_id, local_kind), UNIQUE (user_id, google_event_id));
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.calendar_links TO service_role;
+ALTER TABLE public.calendar_links ENABLE ROW LEVEL SECURITY;
