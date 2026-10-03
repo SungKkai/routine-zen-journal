@@ -63,6 +63,7 @@ function TodayPage() {
 
   return (
     <div className="enter space-y-12">
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
       <header>
         <p className="label-mono text-accent">{new Date().toDateString()}</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tighter sm:text-4xl">
@@ -76,7 +77,7 @@ function TodayPage() {
         </p>
       </header>
 
-      <section className="rounded-xl border border-border bg-card p-6">
+      <section className="rounded-md border border-border bg-card p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="label-mono text-muted-foreground">Focus timer</p>
@@ -116,6 +117,7 @@ function TodayPage() {
           </div>
         </div>
       </section>
+      </div>
 
       <DayPlan tasks={todaysTasks} routines={todaysRoutine} />
 
