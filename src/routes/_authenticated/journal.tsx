@@ -33,6 +33,8 @@ export const Route = createFileRoute("/_authenticated/journal")({
         property: "og:description",
         content: "Log your mood and energy, then think it through with a sharp AI counterpart.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

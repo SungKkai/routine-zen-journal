@@ -16,6 +16,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Tasks, routines, calendar and a focus timer, without the project-management clutter.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Landing,

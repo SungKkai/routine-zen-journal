@@ -29,6 +29,8 @@ export const Route = createFileRoute("/_authenticated/habits")({
       { name: "description", content: "Track daily habits and keep your streaks alive." },
       { property: "og:title", content: "Habits — Kronos" },
       { property: "og:description", content: "Track daily habits and keep your streaks alive." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
