@@ -379,7 +379,7 @@ export function useProfile() {
 export function useUpdateProfile() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (patch: { display_name?: string | null }) => {
+    mutationFn: async (patch: { display_name?: string | null; avatar_key?: string; background_key?: string }) => {
       const user_id = await requireUserId();
       const { error } = await supabase
         .from("profiles")
@@ -387,5 +387,29 @@ export function useUpdateProfile() {
       if (error) throw new Error(error.message);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["profile"] }),
+  });
+}
+
+export function useLoginDays() {
+  return useQuery({
+    queryKey: ["login_days"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("login_days").select("login_date").order("login_date", { ascending: false });
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    },
+  });
+}
+
+export function useRecordLoginDay() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const user_id = await requireUserId();
+      const login_date = new Date().toISOString().slice(0, 10);
+      const { error } = await supabase.from("login_days").upsert({ user_id, login_date }, { onConflict: "user_id,login_date", ignoreDuplicates: true });
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["login_days"] }),
   });
 }

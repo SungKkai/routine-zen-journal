@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import {
   CalendarDays,
   ChevronDown,
@@ -15,7 +15,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfile } from "@/lib/data";
+import { useProfile, useRecordLoginDay } from "@/lib/data";
 import { QuickAdd } from "@/components/quick-add";
 import { CommandPalette } from "@/components/command-palette";
 import { RemindersProvider } from "@/components/reminders-provider";
@@ -52,6 +52,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isToday = useRouterState({ select: (s) => s.location.pathname === "/today" });
   const queryClient = useQueryClient();
   const { data: profile } = useProfile();
+  const recordLogin = useRecordLoginDay();
+
+  useEffect(() => {
+    recordLogin.mutate();
+  // Once per mounted signed-in shell; the database ignores duplicate days.
+  }, []);
 
   const initials = (profile?.display_name ?? "You")
     .split(" ")
@@ -74,7 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={`min-h-screen bg-background text-foreground ${profile?.background_key ? `theme-${profile.background_key}` : "theme-plain"}`}>
       <nav className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-border bg-background/80 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-4">
         <div className="flex min-w-0 items-center gap-4 lg:gap-8">
           <Link to="/today" className="text-base font-semibold uppercase tracking-tight sm:text-lg">
