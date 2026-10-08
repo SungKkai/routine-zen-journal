@@ -23,6 +23,8 @@ export const Route = createFileRoute("/_authenticated/today")({
       { name: "description", content: "Your tasks, routine blocks and focus timer for today." },
       { property: "og:title", content: "Today — Kronos" },
       { property: "og:description", content: "Your tasks, routine blocks and focus timer for today." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_authenticated/goals")({
       { name: "description", content: "Group tasks under goals and watch progress build." },
       { property: "og:title", content: "Goals — Kronos" },
       { property: "og:description", content: "Group tasks under goals and watch progress build." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -6,9 +6,11 @@
 - Phase 3: Mobile polish + PWA, command palette, goals, data export
 - Phase 4: Reminders, day planner, analytics deep-dive, goal sharing, journal → tasks
 - Phase 5: Offline support, weekly review ritual, polish pass
+- Offline task/routine sync, single global timer, streamlined navigation
+- Notion/Google-style calendar with two-way Google Calendar sync
+- Achievements, reward unlocks, RPG avatars, profile backgrounds, referral action
+- Today timer positioned once in the right-hand column
 
 ## Open
 - Email reminders — blocked: needs a sender domain the user owns
-- Calendar redesign, two-way Google Calendar connection, achievements/rewards, backgrounds, unlockable avatars
-- Show the timer once: on the right of Today, floating on other pages
 - Verify offline queue, timer, and navigation changes

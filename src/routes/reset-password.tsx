@@ -14,6 +14,8 @@ export const Route = createFileRoute("/reset-password")({
       { name: "description", content: "Choose a new password for your Kronos account." },
       { property: "og:title", content: "Set a new password — Kronos" },
       { property: "og:description", content: "Choose a new password for your Kronos account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

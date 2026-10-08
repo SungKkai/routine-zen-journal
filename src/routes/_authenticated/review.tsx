@@ -30,6 +30,8 @@ export const Route = createFileRoute("/_authenticated/review")({
         property: "og:description",
         content: "Close the week: what got done, what slipped, and what carries over.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

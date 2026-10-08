@@ -21,6 +21,8 @@ export const Route = createFileRoute("/_authenticated/settings")({
       { name: "description", content: "Manage your profile and task categories." },
       { property: "og:title", content: "Settings — Kronos" },
       { property: "og:description", content: "Manage your profile and task categories." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

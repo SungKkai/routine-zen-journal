@@ -15,6 +15,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in or create your Kronos account to plan your day." },
       { property: "og:title", content: "Sign in — Kronos" },
       { property: "og:description", content: "Sign in or create your Kronos account to plan your day." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

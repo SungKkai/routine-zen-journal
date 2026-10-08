@@ -37,14 +37,14 @@ function eventDate(event: GEvent) {
   if (!start) return null;
   return { due_date: start.slice(0, 10), due_time: event.start?.dateTime ? start.slice(11, 16) : null };
 }
-function taskEvent(task: { title: string; description: string | null; due_date: string | null; due_time: string | null; duration_minutes: number | null }) {
+function taskEvent(task: { title: string; description: string | null; due_date: string | null; due_time: string | null }) {
   const date = task.due_date ?? new Date().toISOString().slice(0, 10);
   if (!task.due_time) {
     const next = new Date(`${date}T12:00:00Z`); next.setUTCDate(next.getUTCDate() + 1);
     return { summary: task.title, description: task.description ?? '', start: { date }, end: { date: next.toISOString().slice(0, 10) } };
   }
   const start = new Date(`${date}T${task.due_time}:00`);
-  const end = new Date(start.getTime() + (task.duration_minutes ?? 30) * 60000);
+  const end = new Date(start.getTime() + 30 * 60000);
   return { summary: task.title, description: task.description ?? '', start: { dateTime: start.toISOString() }, end: { dateTime: end.toISOString() } };
 }
 export const syncGoogleCalendar = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
@@ -61,7 +61,7 @@ export const syncGoogleCalendar = createServerFn({ method: 'POST' }).middleware(
   if (linkError) throw linkError;
   const taskById = new Map((tasks ?? []).map((t) => [t.id, t]));
   const linkByEvent = new Map((links ?? []).map((l) => [l.google_event_id, l]));
-  const linkByLocal = new Map((links ?? []).map((l) => l.local_id, l));
+  const linkByLocal = new Map((links ?? []).map((l) => [l.local_id, l] as const));
   let imported = 0, exported = 0, updated = 0;
   for (const event of remote.items ?? []) {
     if (event.status === 'cancelled' || !eventDate(event)) continue;

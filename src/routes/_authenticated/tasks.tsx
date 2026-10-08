@@ -13,6 +13,8 @@ export const Route = createFileRoute("/_authenticated/tasks")({
       { name: "description", content: "All of your tasks by priority, status and category." },
       { property: "og:title", content: "Tasks — Kronos" },
       { property: "og:description", content: "All of your tasks by priority, status and category." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
