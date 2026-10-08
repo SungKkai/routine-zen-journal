@@ -42,6 +42,8 @@ export const Route = createFileRoute("/_authenticated/insights")({
         content: "Focus hours, completed tasks, mood trends and an AI weekly reflection.",
       },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: InsightsPage,
