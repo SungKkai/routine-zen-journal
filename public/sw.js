@@ -1,4 +1,4 @@
-const CACHE = "kronos-v1";
+const CACHE = "kronos-v2";
 const SHELL = ["/", "/manifest.webmanifest", "/icon-192.png", "/icon-512.png", "/favicon.png"];
 
 self.addEventListener("install", (event) => {
@@ -37,10 +37,14 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets: cache first, refresh in the background.
-  event.respondWith(
-    caches.match(req).then((hit) => {
-      const network = fetch(req)
+  const isCode = ["script", "style", "worker"].includes(req.destination)
+    || url.pathname.startsWith("/node_modules/")
+    || url.pathname.startsWith("/@vite/");
+
+  // Code must be network-first so an update never mixes old React/router files.
+  if (isCode) {
+    event.respondWith(
+      fetch(req)
         .then((res) => {
           if (res.ok && res.type === "basic") {
             const copy = res.clone();
@@ -48,8 +52,19 @@ self.addEventListener("fetch", (event) => {
           }
           return res;
         })
-        .catch(() => hit ?? Response.error());
-      return hit ?? network;
-    }),
+        .catch(() => caches.match(req).then((hit) => hit ?? Response.error())),
+    );
+    return;
+  }
+
+  // Images and other static files can remain cache-first.
+  event.respondWith(
+    caches.match(req).then((hit) => hit ?? fetch(req).then((res) => {
+      if (res.ok && res.type === "basic") {
+        const copy = res.clone();
+        caches.open(CACHE).then((cache) => cache.put(req, copy));
+      }
+      return res;
+    })),
   );
 });
