@@ -10,7 +10,7 @@
 - Notion/Google-style calendar with two-way Google Calendar sync
 - Achievements, reward unlocks, RPG avatars, profile backgrounds, referral action
 - Today timer positioned once in the right-hand column
+- Verified Today, Calendar, Rewards, global timer, and streamlined navigation in the signed-in preview
 
 ## Open
 - Email reminders — blocked: needs a sender domain the user owns
-- Verify offline queue, timer, and navigation changes
